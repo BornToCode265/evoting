@@ -7,6 +7,8 @@ Try running some of the following tasks:
 npx hardhat node
 npx hardhat compile
 node "scripts/deploy.js" --network localhost
+
+npx hardhat test
 ```
 
 Database configuration 
