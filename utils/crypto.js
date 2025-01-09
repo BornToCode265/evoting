@@ -5,8 +5,21 @@ const secretKey =
 const iv = crypto.randomBytes(16);
 
 const encrypt = (text) => {
+  console.log("---algorithm: ", algorithm);
+  console.log("----- secretKey: ", secretKey);
+  console.log("===iv: ", iv);
+  console.log("==== encrypting text: ", text);
   const cipher = crypto.createCipheriv(algorithm, secretKey, iv);
+
+  console.log("== cipher: ", cipher);
   const encrypted = Buffer.concat([cipher.update(text), cipher.final()]);
+
+  console.log("===encrypted: ", encrypted);
+  console.log("===iv.toString(hex): ", iv.toString("hex"));
+  console.log("result: ", {
+    iv: iv.toString("hex"),
+    content: encrypted.toString("hex"),
+  });
   return { iv: iv.toString("hex"), content: encrypted.toString("hex") };
 };
 

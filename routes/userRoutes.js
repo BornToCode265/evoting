@@ -6,18 +6,43 @@ const router = express.Router();
 
 // Register a user
 router.post("/register", async (req, res) => {
+  console.log("registering user");
+  console.log("req.body : ", req.body);
   const { nationalID } = req.body;
+
+  console.log("full Name :", req.body.fullName);
+  const { fullName } = req.body;
+  console.log("national id number", nationalID);
 
   try {
     // Generate wallet
+    console.log("====start generating unique with :====== ");
     const wallet = ethers.Wallet.createRandom();
-    const walletAddress = wallet.address;
-    const encryptedPrivateKey = encrypt(wallet.privateKey);
 
-    const query = `INSERT INTO users (nationalID, walletAddress, encryptedPrivateKey) VALUES (?, ?, ?)`;
+    console.log("wallet generated", wallet);
+    const walletAddress = wallet.address;
+
+    // Encrypt private key
+    console.log("++++wallet private key :++++", wallet.privateKey);
+    //const encryptedPrivateKey = encrypt(wallet.privateKey);
+    const encryptedPrivateKey = wallet.privateKey;
+
+    // Save user to database
+    console.log("encryptedPrivateKey", encryptedPrivateKey);
+
+    // Insert to database
+    console.log("===start inserting to database===");
+    const query = `INSERT INTO users (nationalID, fullName, walletAddress, encryptedPrivateKey, nationalIdStatus) VALUES (?, ?, ?,?,?)`;
+
     db.query(
       query,
-      [nationalID, walletAddress, JSON.stringify(encryptedPrivateKey)],
+      [
+        nationalID,
+        fullName,
+        walletAddress,
+        JSON.stringify(encryptedPrivateKey),
+        "pending",
+      ],
       (err, result) => {
         if (err) {
           if (err.code === "ER_DUP_ENTRY") {
@@ -43,7 +68,7 @@ router.post("/register", async (req, res) => {
 router.get("/:nationalID", (req, res) => {
   const { nationalID } = req.params;
 
-  const query = `SELECT nationalID, walletAddress FROM users WHERE nationalID = ?`;
+  const query = `SELECT * FROM users WHERE nationalID = ?`;
   db.query(query, [nationalID], (err, results) => {
     if (err) {
       return res.status(500).send({ error: "Database error", details: err });
