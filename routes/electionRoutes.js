@@ -21,9 +21,9 @@ router.post("/vote", async (req, res) => {
     if (results.length === 0) {
       return res.status(404).send({ error: "User not found" });
     }
-
+    console.log("==here is the result==", results);
     const { walletAddress, encryptedPrivateKey } = results[0];
-    const decryptedKey = decrypt(JSON.parse(encryptedPrivateKey));
+    const decryptedKey = JSON.parse(encryptedPrivateKey); // Ensure decryptedKey is properly formatted
     const wallet = new ethers.Wallet(decryptedKey, provider);
 
     try {
